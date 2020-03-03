@@ -1,11 +1,12 @@
 import pandas as pd
 from sqlalchemy import create_engine
 import os
-#get current working directory
+#Get current working directory
 cd=os.getcwd()
-#get the list of files in this directory
+#Get the list of files in this directory
 files=os.listdir(cd)
 path=""
+
 #find file with .csv extension
 for f in files:
     if (f.lower().endswith(".csv")):
@@ -13,15 +14,16 @@ for f in files:
         break
 
 performers=int(input("enter no of performers "))
+
 if performers==1:
     n=0
 elif performers>1:
     n=1
+    
 #read the csv/excel file as pandas dataframe
 csv=pd.read_csv(path,header=n,encoding='utf-8')
 #sort the dataframe according to track id
 csv_data=csv.sort_values(by=['Track ID'])
-
 
 #used to name the columns continues like Performer_Name_1,Performer_Name_2 for multiple performers
 new_columns=[]
@@ -33,6 +35,7 @@ for item in csv_data.columns:
         newitem="{}_{}".format(item,counter)
     new_columns.append(newitem)
 csv_data.columns=new_columns
+
 #replace empty spaces and '.' from column name 
 csv_data.columns=csv_data.columns.str.replace(" ","_")
 csv_data.columns=csv_data.columns.str.replace(".","_")
@@ -40,15 +43,15 @@ csv_data.columns=csv_data.columns.str.replace(".","_")
 #create a list of track id's
 track=csv_data['Track_ID']
 
-
 #create the connection engine
 engine=create_engine('mysql+mysqlconnector://db_username:db_password@db_hostname:3306/database_name',echo=False)
+
 #read the database data as pandas dataframe
 database_data=pd.read_sql_query("select birth_name,performer_role_id,unique_track_id,performer_type from performer where unique_track_id in "+str(tuple(track)),engine)
 
-
 missmatch_tracks=list()
 empty_tracks=list()
+
 #iterate each track id inside the track list
 for  i in track:
     csv_list=list()
@@ -62,6 +65,7 @@ for  i in track:
             #first performer
             #get the performer_birth_name from the dataframe
             performer_name=new_csv['Performer_Legal/Birth_Name'].values[0]
+            
             #checks whether the performer_name is of string type or not
             if isinstance(performer_name,str):
                 #strip is used to remove empty spaces from front and the end 
@@ -89,6 +93,7 @@ for  i in track:
                     database_list.append(db_performer_name)
                 else:
                     pass
+                
     count=0
     #check whether database_list is empty or not
     if database_list !=[]:
@@ -106,16 +111,17 @@ for  i in track:
             if count ==-1:
                 #break the loop if even a single value from csv_list doesn't match any value inside database_list after iterating the whole database_list
                     break
+                    
     elif database_list==[]:
         #if database_list is empty append the track id to a list
         empty_tracks.append(i)
+        
     if count==1:
         pass  
     elif count==-1:
         #if missmatch occurs append the track id to a list
         missmatch_tracks.append(i)
         
-
 print(f"missmatched tracks:- \n")
 print(len(missmatch_tracks))
 if missmatch_tracks!=[]:
