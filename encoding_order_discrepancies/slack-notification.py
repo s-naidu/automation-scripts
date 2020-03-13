@@ -1,4 +1,4 @@
-from datetime import datetime,timedelta,date,timezone
+from datetime import timedelta,date
 import requests
 import json
 import snowflake.connector 
@@ -9,7 +9,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric import dsa
 from cryptography.hazmat.primitives import serialization
-
+#Used to find the files in the directory and then get the file ending with .p8 and assign to variable path
 cd=os.getcwd()
 files=os.listdir(cd)
 path=""
@@ -17,10 +17,12 @@ for f in files:
     if (f.lower().endswith(".p8")):
         path=f
         break
+# Used to find today's and yesterday's date
 today = date.today()
 yesterday = (today - timedelta(1))
 SNOWFLAKE_PRIVATE_KEY_PATH = path
 SNOWFLAKE_KEY_PASSPHRASE = config.SNOWFLAKE_PASSPHRASE
+
 if SNOWFLAKE_KEY_PASSPHRASE:
     if not SNOWFLAKE_PRIVATE_KEY_PATH:
         print('SNOWFLAKE_PRIVATE_KEY_PATH missing')
@@ -36,8 +38,7 @@ if SNOWFLAKE_KEY_PASSPHRASE:
         encryption_algorithm=serialization.NoEncryption())
 else:
     private_key = None
-
-
+#insert database credentials
 ctx = snowflake.connector.connect(
         user=config.SNOWFLAKE_USER_NAME,
         account=config.SNOWFLAKE_ACCOUNT,
@@ -47,8 +48,7 @@ ctx = snowflake.connector.connect(
         warehouse=config.SNOWFLAKE_WAREHOUSE,
         role=config.SNOWFLAKE_ROLE
         )
-
-
+# Read the sql query in a pandas dataframe
 data_snow=pd.read_sql_query(f"""SELECT encoding_order.entry_date, xy.* 
 FROM (
     SELECT encoding_order.encoding_order_id,
@@ -70,8 +70,8 @@ INNER JOIN orchard_app_reporting.art_relations.encoding_order
 WHERE xy.eo_upcs_count <> xy.eq_upcs_count
 ORDER BY 2
 LIMIT 100""",ctx)
-print(data_snow)
 
+#Iterate the dataframe and send the msg to slack as per needed 
 for index,row in data_snow.iterrows():
     i=row['ENCODING_ORDER_ID']
     eo_count=row['EO_UPCS_COUNT']
