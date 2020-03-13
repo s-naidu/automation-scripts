@@ -1,13 +1,15 @@
-from datetime import timedelta,date
+from datetime import datetime,timedelta,date,timezone
 import requests
-import os
 import json
-from sqlalchemy import create_engine
 import snowflake.connector 
 import pandas as pd
+import os
+import config
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric import dsa
+from cryptography.hazmat.primitives import serialization
+
 cd=os.getcwd()
 files=os.listdir(cd)
 path=""
@@ -18,8 +20,7 @@ for f in files:
 today = date.today()
 yesterday = (today - timedelta(1))
 SNOWFLAKE_PRIVATE_KEY_PATH = path
-SNOWFLAKE_KEY_PASSPHRASE = password
-
+SNOWFLAKE_KEY_PASSPHRASE = config.SNOWFLAKE_PASSPHRASE
 if SNOWFLAKE_KEY_PASSPHRASE:
     if not SNOWFLAKE_PRIVATE_KEY_PATH:
         print('SNOWFLAKE_PRIVATE_KEY_PATH missing')
@@ -38,14 +39,15 @@ else:
 
 
 ctx = snowflake.connector.connect(
-        user=db_user,
-        account=db_account,
+        user=config.SNOWFLAKE_USER_NAME,
+        account=config.SNOWFLAKE_ACCOUNT,
         private_key=private_key,
-        database=db_name,
-        schema=db_schema,
-        warehouse=db_warehouse,
-        role=db_role
+        database=config.SNOWFLAKE_DATABASE,
+        schema=config.SNOWFLAKE_SCHEMA,
+        warehouse=config.SNOWFLAKE_WAREHOUSE,
+        role=config.SNOWFLAKE_ROLE
         )
+
 
 data_snow=pd.read_sql_query(f"""SELECT encoding_order.entry_date, xy.* 
 FROM (
@@ -68,23 +70,25 @@ INNER JOIN orchard_app_reporting.art_relations.encoding_order
 WHERE xy.eo_upcs_count <> xy.eq_upcs_count
 ORDER BY 2
 LIMIT 100""",ctx)
+print(data_snow)
+
 for index,row in data_snow.iterrows():
     i=row['ENCODING_ORDER_ID']
     eo_count=row['EO_UPCS_COUNT']
     eq_count=row['EQ_UPCS_COUNT']
-    web_hook= slack_weburl
+    web_hook=config.SLACK_WEBHOOK_URL
     slack_msg={ "username":"#distro-incomplete-encoding-orders" ,
-                "channel":"automation-script",
+                "channel":config.SLACK_CHANNEL_NAME,
                         
                 "attachments":[
-                    {"fallback":"Database not synced properly",
+                    {"fallback":"database is not synced properly",
                     "color":"danger",
                     "fields":[
                         {"title":"Discrepencies in encoding order ID - "+str(i),
                         "value":"Info : {encoding_order_detail_total : "+str(eo_count)+" , encoding_queue_detail_total : "+str(eq_count)+" }"
-                        }
-					]
-                }
-        	]
-    	}
+                                }
+                            ]
+                    }
+        ]
+    }
     requests.post(web_hook,data=json.dumps(slack_msg))
