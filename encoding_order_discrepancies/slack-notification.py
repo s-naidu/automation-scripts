@@ -30,13 +30,13 @@ else:
 
 
 ctx = snowflake.connector.connect(
-        user='dparmar',
-        account='orchard',
+        user=,
+        account=,
         private_key=private_key,
-        database='FACTS',
-        schema='PROD',
-        warehouse='DEV_OWS_WAREHOUSE',
-        role='DEV_ENGINEERING'
+        database=,
+        schema=,
+        warehouse=,
+        role=
         )
 
 data_snow=pd.read_sql_query(f"""SELECT encoding_order.entry_date, xy.* 
