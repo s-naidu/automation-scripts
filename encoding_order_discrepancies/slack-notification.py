@@ -1,5 +1,6 @@
-from datetime import datetime,timedelta,date,timezone
+from datetime import timedelta,date
 import requests
+import os
 import json
 from sqlalchemy import create_engine
 import snowflake.connector 
@@ -7,10 +8,17 @@ import pandas as pd
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric import dsa
+cd=os.getcwd()
+files=os.listdir(cd)
+path=""
+for f in files:
+    if (f.lower().endswith(".p8")):
+        path=f
+        break
 today = date.today()
 yesterday = (today - timedelta(1))
-SNOWFLAKE_PRIVATE_KEY_PATH = 'D:/new-script/rsa_key.p8'
-SNOWFLAKE_KEY_PASSPHRASE = 'snowflake48122112'
+SNOWFLAKE_PRIVATE_KEY_PATH = path
+SNOWFLAKE_KEY_PASSPHRASE = password
 
 if SNOWFLAKE_KEY_PASSPHRASE:
     if not SNOWFLAKE_PRIVATE_KEY_PATH:
@@ -30,13 +38,13 @@ else:
 
 
 ctx = snowflake.connector.connect(
-        user=,
-        account=,
+        user=db_user,
+        account=db_account,
         private_key=private_key,
-        database=,
-        schema=,
-        warehouse=,
-        role=
+        database=db_name,
+        schema=db_schema,
+        warehouse=db_warehouse,
+        role=db_role
         )
 
 data_snow=pd.read_sql_query(f"""SELECT encoding_order.entry_date, xy.* 
@@ -64,7 +72,7 @@ for index,row in data_snow.iterrows():
     i=row['ENCODING_ORDER_ID']
     eo_count=row['EO_UPCS_COUNT']
     eq_count=row['EQ_UPCS_COUNT']
-    web_hook='https://hooks.slack.com/services/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'
+    web_hook= slack_weburl
     slack_msg={ "username":"#distro-incomplete-encoding-orders" ,
                 "channel":"automation-script",
                         
