@@ -1,5 +1,0 @@
-pandas ==1.0.1
-snowflake-connector-python==2.2.2
-pyhton-dotenv==0.12.0
-openpyxl ==3.0.3
-xlrd==1.2.0
