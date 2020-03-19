@@ -7,6 +7,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric import dsa
 from cryptography.hazmat.primitives import serialization
 
+#Find the key inside the directory 
 cd=os.getcwd()
 files=os.listdir(cd)
 path=""
@@ -14,8 +15,7 @@ for f in files:
     if (f.lower().endswith(".p8")):
         path=f
         break
-
-
+   
 SNOWFLAKE_PRIVATE_KEY_PATH = path
 SNOWFLAKE_KEY_PASSPHRASE = config.SNOWFLAKE_PASSPHRASE
 if SNOWFLAKE_KEY_PASSPHRASE:
@@ -34,7 +34,7 @@ if SNOWFLAKE_KEY_PASSPHRASE:
 else:
     private_key = None
 
-
+#Connect to snowflake
 ctx = snowflake.connector.connect(
         user=config.SNOWFLAKE_USER_NAME,
         account=config.SNOWFLAKE_ACCOUNT,
@@ -45,6 +45,7 @@ ctx = snowflake.connector.connect(
         role=config.SNOWFLAKE_ROLE
         )
 
+#Find the excel file inside diectory
 cd=os.getcwd()
 files=os.listdir(cd)
 path_excel=""
@@ -52,22 +53,18 @@ for f in files:
     if (f.lower().endswith(".xlsx")):
         path_excel=f
         break
+
+#Read the excel 
 excel=pd.read_excel(path_excel,header=0)
+#Get the list of upc 
 l1 = excel['Upc']
 tracks=[]
+#Remove duplicate upc's
 for i in l1:
     if i not in tracks:
         tracks.append(i)
-'''
-l1=[195081158778, 8435609900383, 195081160832, 7891430473129, 827577538725, 38153064488, 827577538244, 889176953378,
-889845860402,
-38153049089,
-5425004840769,
-711297389357,
-711297389340,
-195081159898,
-663993171128]
-'''
+        
+#Read query and get data in a dataframe
 data=pd.read_sql_query(f"""SELECT r.upc, t.track_id, t.cd
         FROM ART_RELATIONS.RELEASES r
         INNER JOIN ART_RELATIONS.ARTIST_INFO ai ON ai.artist_id = r.artist_id
@@ -108,11 +105,11 @@ data=pd.read_sql_query(f"""SELECT r.upc, t.track_id, t.cd
             AND r.release_status = 'in_content'
             AND r.deletions <> 'Y'
             AND v.vendor_id NOT IN (7123, 25824,16055)
-            -- AND t.track_type = 'music'
-            -- AND YEAR(r.release_date) = YEAR(CURRENT_DATE())
             AND r.upc in {str(tuple(tracks))}
         GROUP BY r.upc, r.release_status, v.owner, v.vendor_id,
             t.length_minute,t.length_seconds, ald.duration, t.track_id, t.cd
         ORDER BY r.upc""",ctx)
-print(data)
-data.to_csv("result.csv",index=False)
+
+if data.empty==False:
+#Convert the dataframe result to a csv file
+    data.to_csv("result.csv",index=False)
