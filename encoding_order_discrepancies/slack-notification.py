@@ -1,12 +1,10 @@
 from datetime import timedelta, date
 import requests
 import json
-import snowflake.connector 
 import pandas as pd
 import os
 import config
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization
+import connection
 
 def get_file():
     cd = os.getcwd()
@@ -17,36 +15,6 @@ def get_file():
             path = file
             break
     return path
-
-def connection(path):
-    SNOWFLAKE_PRIVATE_KEY_PATH = path
-    SNOWFLAKE_KEY_PASSPHRASE = config.SNOWFLAKE_PASSPHRASE
-    if SNOWFLAKE_KEY_PASSPHRASE:
-        if not SNOWFLAKE_PRIVATE_KEY_PATH:
-            print('SNOWFLAKE_PRIVATE_KEY_PATH missing')
-        with open(SNOWFLAKE_PRIVATE_KEY_PATH, 'rb') as key:
-            p_key = serialization.load_pem_private_key( 
-                key.read(), 
-                password=SNOWFLAKE_KEY_PASSPHRASE.encode(), 
-                backend=default_backend()
-            )
-        private_key = p_key.private_bytes(
-        encoding=serialization.Encoding.DER, 
-            format=serialization.PrivateFormat.PKCS8, 
-            encryption_algorithm=serialization.NoEncryption())
-    else:
-        private_key = None
-
-    db_connection = snowflake.connector.connect( 
-        user=config.SNOWFLAKE_USER_NAME, 
-        account=config.SNOWFLAKE_ACCOUNT, 
-        private_key=private_key, 
-        database=config.SNOWFLAKE_DATABASE, 
-        schema=config.SNOWFLAKE_SCHEMA, 
-        warehouse=config.SNOWFLAKE_WAREHOUSE, 
-        role=config.SNOWFLAKE_ROLE
-        )
-    return db_connection
 
 def query(yesterday, today, db_connection):
     db_data = pd.read_sql_query(f"""SELECT encoding_order.entry_date, xy.* 
@@ -97,7 +65,7 @@ def main():
     today = date.today()
     yesterday = (today - timedelta(1))
     path = get_file() 
-    db_connection = connection(path)
+    db_connection = connection.connection(path)
     query(yesterday, today, db_connection)
 
 if __name__ == '__main__':
