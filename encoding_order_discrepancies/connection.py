@@ -16,10 +16,10 @@ def connection(path):
                 backend=default_backend()
             )
         private_key = pem_private_key.private_bytes(
-        	encoding=serialization.Encoding.DER, 
-        	format=serialization.PrivateFormat.PKCS8, 
-        	encryption_algorithm=serialization.NoEncryption()
-        	)
+            encoding=serialization.Encoding.DER, 
+            format=serialization.PrivateFormat.PKCS8, 
+            encryption_algorithm=serialization.NoEncryption()
+            )
     else:
         private_key = None
 
