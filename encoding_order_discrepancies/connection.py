@@ -10,15 +10,16 @@ def connection(path):
         if not SNOWFLAKE_PRIVATE_KEY_PATH:
             print('SNOWFLAKE_PRIVATE_KEY_PATH missing')
         with open(SNOWFLAKE_PRIVATE_KEY_PATH, 'rb') as key:
-            p_key = serialization.load_pem_private_key( 
+            pem_private_key = serialization.load_pem_private_key( 
                 key.read(), 
                 password=SNOWFLAKE_KEY_PASSPHRASE.encode(), 
                 backend=default_backend()
             )
-        private_key = p_key.private_bytes(
-        encoding=serialization.Encoding.DER, 
-        format=serialization.PrivateFormat.PKCS8, 
-        encryption_algorithm=serialization.NoEncryption())
+        private_key = pem_private_key.private_bytes(
+        	encoding=serialization.Encoding.DER, 
+        	format=serialization.PrivateFormat.PKCS8, 
+        	encryption_algorithm=serialization.NoEncryption()
+        	)
     else:
         private_key = None
 
@@ -30,5 +31,5 @@ def connection(path):
         schema=config.SNOWFLAKE_SCHEMA, 
         warehouse=config.SNOWFLAKE_WAREHOUSE, 
         role=config.SNOWFLAKE_ROLE
-        )
+    )
     return db_connection
