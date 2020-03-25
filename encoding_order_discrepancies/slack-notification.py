@@ -25,30 +25,30 @@ def connection(path):
         if not SNOWFLAKE_PRIVATE_KEY_PATH:
             print('SNOWFLAKE_PRIVATE_KEY_PATH missing')
         with open(SNOWFLAKE_PRIVATE_KEY_PATH, 'rb') as key:
-            p_key = serialization.load_pem_private_key(
+            p_key = serialization.load_pem_private_key( 
                 key.read(), 
                 password=SNOWFLAKE_KEY_PASSPHRASE.encode(), 
                 backend=default_backend()
             )
         private_key = p_key.private_bytes(
-            encoding=serialization.Encoding.DER, 
+        encoding=serialization.Encoding.DER, 
             format=serialization.PrivateFormat.PKCS8, 
             encryption_algorithm=serialization.NoEncryption())
     else:
         private_key = None
 
-    db_connection = snowflake.connector.connect(
-            user=config.SNOWFLAKE_USER_NAME, 
-            account=config.SNOWFLAKE_ACCOUNT, 
-            private_key=private_key, 
-            database=config.SNOWFLAKE_DATABASE, 
-            schema=config.SNOWFLAKE_SCHEMA, 
-            warehouse=config.SNOWFLAKE_WAREHOUSE, 
-            role=config.SNOWFLAKE_ROLE
-            )
+    db_connection = snowflake.connector.connect( 
+        user=config.SNOWFLAKE_USER_NAME, 
+        account=config.SNOWFLAKE_ACCOUNT, 
+        private_key=private_key, 
+        database=config.SNOWFLAKE_DATABASE, 
+        schema=config.SNOWFLAKE_SCHEMA, 
+        warehouse=config.SNOWFLAKE_WAREHOUSE, 
+        role=config.SNOWFLAKE_ROLE
+        )
     return db_connection
 
-def query(yesterday,today,db_connection):
+def query(yesterday, today, db_connection):
     db_data = pd.read_sql_query(f"""SELECT encoding_order.entry_date, xy.* 
     FROM (
         SELECT encoding_order.encoding_order_id,
@@ -69,11 +69,11 @@ def query(yesterday,today,db_connection):
         ON encoding_order.encoding_order_id = xy.encoding_order_id
     WHERE xy.eo_upcs_count <> xy.eq_upcs_count
     ORDER BY 2
-    LIMIT 100""",db_connection)
+    LIMIT 100""", db_connection)
     message(db_data)
 
 def message(db_data):
-    for index,row in db_data.iterrows():
+    for index, row in db_data.iterrows():
         i = row['ENCODING_ORDER_ID']
         eo_count = row['EO_UPCS_COUNT']
         eq_count = row['EQ_UPCS_COUNT']
@@ -81,24 +81,23 @@ def message(db_data):
         slack_msg = { "username":"#distro-incomplete-encoding-orders", 
         "channel":config.SLACK_CHANNEL_NAME, 
         "attachments":[
-             { "fallback":"database is not synced properly", 
-               "color":"danger", 
-               "fields":[
-               { "title":"Discrepencies in encoding order ID - "+str(i), 
-                 "value":"Info : {encoding_order_detail_total : "+str(eo_count)+", encoding_queue_detail_total : "+str(eq_count)+" }"
+            { "fallback":"Encoding Order Discrepancies found", 
+            "color":"danger", 
+            "fields":[
+                { "title":"Discrepencies in encoding order ID - "+str(i), 
+                "value":"Info : {encoding_order_detail_total : "+str(eo_count)+", encoding_queue_detail_total : "+str(eq_count)+" }"
                             }
                         ]
                     }
                 ]
         }
-	    requests.post(web_hook,data=json.dumps(slack_msg))
-
+        requests.post(web_hook, data=json.dumps(slack_msg))
 def main():
     today = date.today()
     yesterday = (today - timedelta(1))
     path = get_file() 
     db_connection = connection(path)
-    query(yesterday,today,db_connection)
+    query(yesterday, today, db_connection)
 
 if __name__ == '__main__':
     main()
