@@ -78,14 +78,14 @@ def message(db_data):
         eo_count = row['EO_UPCS_COUNT']
         eq_count = row['EQ_UPCS_COUNT']
         web_hook = config.SLACK_WEBHOOK_URL
-        slack_msg = { "username":"#distro-incomplete-encoding-orders", 
-        "channel":config.SLACK_CHANNEL_NAME, 
-        "attachments":[
-            { "fallback":"Encoding Order Discrepancies found", 
-            "color":"danger", 
-            "fields":[
-                { "title":"Discrepencies in encoding order ID - "+str(i), 
-                "value":"Info : {encoding_order_detail_total : "+str(eo_count)+", encoding_queue_detail_total : "+str(eq_count)+" }"
+        slack_msg = { "username" : "#distro-incomplete-encoding-orders", 
+        "channel" : config.SLACK_CHANNEL_NAME, 
+        "attachments" : [
+            { "fallback" : "Encoding Order Discrepancies found", 
+            "color" : "danger", 
+            "fields" : [
+                { "title" : "Discrepencies in encoding order ID - " + str(i), 
+                "value" : "Info : {encoding_order_detail_total : " + str(eo_count) + ", encoding_queue_detail_total : " + str(eq_count) + " }"
                             }
                         ]
                     }
