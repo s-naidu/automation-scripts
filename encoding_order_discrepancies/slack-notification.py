@@ -92,6 +92,7 @@ def message(db_data):
                 ]
         }
         requests.post(web_hook, data=json.dumps(slack_msg))
+
 def main():
     today = date.today()
     yesterday = (today - timedelta(1))
