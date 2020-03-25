@@ -9,9 +9,9 @@ import connection
 def get_file():
     cd = os.getcwd()
     files = os.listdir(cd)
-    path = ""
+    path = ''
     for file in files:
-        if (file.lower().endswith(".p8")):
+        if (file.lower().endswith('.p8')):
             path = file
             break
     return path
@@ -36,8 +36,7 @@ def query(yesterday, today, db_connection):
     INNER JOIN orchard_app_reporting.art_relations.encoding_order 
         ON encoding_order.encoding_order_id = xy.encoding_order_id
     WHERE xy.eo_upcs_count <> xy.eq_upcs_count
-    ORDER BY 2
-    LIMIT 100""", db_connection)
+    ORDER BY 2 """, db_connection)
     message(db_data)
 
 def message(db_data):
@@ -46,18 +45,22 @@ def message(db_data):
         eo_count = row['EO_UPCS_COUNT']
         eq_count = row['EQ_UPCS_COUNT']
         web_hook = config.SLACK_WEBHOOK_URL
-        slack_msg = { "username" : "#distro-incomplete-encoding-orders", 
-        "channel" : config.SLACK_CHANNEL_NAME, 
-        "attachments" : [
-            { "fallback" : "Encoding Order Discrepancies found", 
-            "color" : "danger", 
-            "fields" : [
-                { "title" : "Discrepencies in encoding order ID - " + str(i), 
-                "value" : "Info : {encoding_order_detail_total : " + str(eo_count) + ", encoding_queue_detail_total : " + str(eq_count) + " }"
-                            }
-                        ]
-                    }
-                ]
+        slack_msg = {
+            'username': '#distro-incomplete-encoding-orders', 
+            'channel': config.SLACK_CHANNEL_NAME, 
+            'attachments': [
+                {
+                    'fallback': 'Encoding Order Discrepancies found', 
+                    'color': 'danger', 
+                    'fields': [
+                        {
+                            'title': 'Discrepencies in encoding order ID - ' + str(i), 
+                            'value': 'Info: {encoding_order_detail_total: ' + str(eo_count) + 
+                                     ', encoding_queue_detail_total: ' + str(eq_count) + ' }'
+                        }
+                    ]
+                }
+            ]
         }
         requests.post(web_hook, data=json.dumps(slack_msg))
 
