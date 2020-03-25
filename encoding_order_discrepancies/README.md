@@ -3,14 +3,21 @@ This script finds the discrepancies between the two databases and sends a messag
 
 #Installation
 ```
-py -3 -m venv env
-env\Scripts\activate
+python3 -m venv env
+```
+```
+source env/bin/activate
+```
+```
 pip install -r requirements.txt
+```
+```
+cp .env.shadow .env
 ```
 
 #Running the script
 ```
-py slack-notification.py
+python slack-notification.py
 ```
 #Steps to create incoming-webhook
 1. Go to apps inside slack
