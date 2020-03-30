@@ -31,6 +31,6 @@ python slack-notification.py
 ### Steps for execution
 1. Create a new directory.
 2. Insert all the files inside this directory.
-3. Update the database credentials, slack webhook url and channel-name in .env file.
+3. Update the database credentials, slack webhook url, channel-name and bot-name in .env file.
 4. Install the dependencies.
 5. Run the script.
