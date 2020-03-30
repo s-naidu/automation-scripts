@@ -46,12 +46,12 @@ def send_message(cursor):
     """
     msg = ''
     for row in cursor:
-        msg = 'Info : {encoding_order_detail_total : '
+        msg = 'Info: {encoding_order_detail_total: '
         + str(row['EO_UPCS_COUNT'])
-        + ', encoding_queue_detail_total : '
+        + ', encoding_queue_detail_total: '
         + str(row['EQ_UPCS_COUNT']) + '}'
         slack_msg = {
-            'username': '#distro-incomplete-encoding-orders',
+            'username': config.BOT_NAME,
             'channel': config.SLACK_CHANNEL_NAME,
             'attachments': [
                 {
