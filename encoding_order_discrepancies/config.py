@@ -9,3 +9,4 @@ SNOWFLAKE_PASSWORD = os.environ.get('SNOWFLAKE_PASSWORD')
 
 SLACK_WEBHOOK_URL = os.environ.get('SLACK_WEBHOOK_URL')
 SLACK_CHANNEL_NAME = os.environ.get('SLACK_CHANNEL_NAME')
+BOT_NAME = os.environ.get('BOT_NAME')
