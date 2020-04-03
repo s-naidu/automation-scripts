@@ -25,4 +25,5 @@ python clear-bacon-history.py
 2. Rename the .env.shadow to .env 
 3. Update the art_relations database credentials in .env file
 4. Update youtube_video_id's in the sql_create query
+5. Change the tablename in the CREATE TABLE section according to the ticket no in the sql_create query 
 5. Run the script python clear-bacon-history.py
