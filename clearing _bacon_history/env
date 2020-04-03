@@ -1,6 +1,0 @@
-# art_relatons mysql configs
-
-DATABASE_HOSTNAME = localhost
-DATABASE_USER_NAME = root
-DATABASE_PASSWORD = root
-DATABASE = youtube
