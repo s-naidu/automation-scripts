@@ -4,8 +4,8 @@ import config
 
 
 def get_data():
-    arg = sys.argv
-    youtube_id_list = arg[1].split(',')
+    argument = sys.argv
+    youtube_id_list = argument[1].split(',')
     return youtube_id_list
 
 
