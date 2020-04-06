@@ -17,13 +17,13 @@ cp .env.shadow .env
 
 ### Running the script
 ```
-python clear-bacon-history.py
+python clear-bacon-history.py id1,id2,id3,id4,....,idn
 ```
 
 ### Steps for execution
 1. Place all files in a directory
-2. Rename the .env.shadow to .env 
-3. Update the art_relations database credentials in .env file
-4. Update youtube_video_id's in the sql_create query
-5. Change the tablename in the CREATE TABLE section according to the ticket no in the sql_create query 
-5. Run the script python clear-bacon-history.py
+2. Rename the .env.shadow to .env
+3. Update the art_relations database credentials and ticket no in .env file
+4. Copy all the youtube_video_id and format it in a single line where id's are separated by comma
+5. Copy the formated string and paste it while running the script
+6. Run the script python clear-bacon-history.py id1,id2,id3,id4,id5,....,idn
