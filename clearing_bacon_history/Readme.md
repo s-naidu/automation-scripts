@@ -16,14 +16,13 @@ cp .env.shadow .env
 ```
 
 ### Running the script
+run the script by running following command providing the list of youtube_video_id as given below:
 ```
-python clear-bacon-history.py id1,id2,id3,id4,....,idn
+python clear-bacon-history.py BQPxgsLX2PM Gx_8z-IufPg
 ```
 
 ### Steps for execution
 1. Place all files in a directory
 2. Rename the .env.shadow to .env
 3. Update the art_relations database credentials and ticket no in .env file
-4. Copy all the youtube_video_id and format it in a single line where id's are separated by comma
-5. Copy the formated string and paste it while running the script
-6. Run the script python clear-bacon-history.py id1,id2,id3,id4,id5,....,idn
+6. Run the script python clear-bacon-history.py id1 id2
