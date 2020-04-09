@@ -26,14 +26,14 @@ def get_data():
 def execute_query(db_connection, youtube_id_list):
     cursor = db_connection.cursor()
     ids_string = ','.join('"{}"'.format(i) for i in youtube_id_list)
-    sql_create = """CREATE TABLE `ROLLBACK-DISTRO-{}_youtube_channel_video_status` AS
+    sql_create = """CREATE TABLE `ROLLBACK-{}_youtube_channel_video_status` AS
     SELECT * FROM youtube_channel_video_status
     WHERE youtube_video_id IN ({})
     """.format(config.TICKET_NO, ids_string)
     cursor.execute(sql_create)
 
     sql_delete = """DELETE yt.* FROM youtube_channel_video_status yt
-    INNER JOIN `ROLLBACK-DISTRO-{}_youtube_channel_video_status`
+    INNER JOIN `ROLLBACK-{}_youtube_channel_video_status`
     rp2829
         ON rp2829.youtube_video_id = yt.youtube_video_id
         """.format(config.TICKET_NO)
