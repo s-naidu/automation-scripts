@@ -1,6 +1,5 @@
 import connection
 import argparse
-import config
 import sys
 import logging
 
@@ -27,16 +26,8 @@ def execute_query(db_connection, youtube_id_list):
     cursor = db_connection.cursor()
     ids_string = ','.join('"{}"'.format(i) for i in youtube_id_list)
     log.info('argument is %s' % ids_string)
-    sql_create = """CREATE TABLE `ROLLBACK-{}_youtube_channel_video_status` AS
-    SELECT * FROM youtube_channel_video_status
-    WHERE youtube_video_id IN ({})
-    """.format(config.TICKET_NO, ids_string)
-    cursor.execute(sql_create)
-
-    sql_delete = """DELETE yt.* FROM youtube_channel_video_status yt
-    INNER JOIN `ROLLBACK-{}_youtube_channel_video_status` rb
-        ON rb.youtube_video_id = yt.youtube_video_id
-        """.format(config.TICKET_NO)
+    sql_delete = """DELETE FROM youtube_channel_video_status
+    WHERE youtube_video_id IN ({})""".format(ids_string)
     cursor.execute(sql_delete)
     db_connection.commit()
     log.info('records deleted: %s' % cursor.rowcount)
